@@ -56,6 +56,12 @@ const CampaignPage = () => {
                         <Button variant="contained" href={`/campaigns/${id}/donate`}>
                             Поддержать
                         </Button>
+                        <Button variant="contained" href={`/campaigns/${id}/update`}>
+                            Редактировать
+                        </Button>
+                        <Button variant="contained" href={`/campaigns/${id}/delete`}>
+                            Удалить
+                        </Button>
                     </Box>
                 </Grid>
             </Grid>

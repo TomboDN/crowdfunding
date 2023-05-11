@@ -94,7 +94,7 @@ const CampaignForm = () => {
             {({ values, errors, touched, handleChange, handleBlur, setFieldValue, handleSubmit, isSubmitting }) => (
                 <Form encType="multipart/form-data">
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '600px', margin: 'auto' }}>
-                        <Typography variant="h4">Создать новую кампанию</Typography>
+                        <Typography variant="h4">Редактировать кампанию</Typography>
                         <TextField label="Название" name="title" value={values.title} onChange={handleChange} onBlur={handleBlur} error={touched.title && Boolean(errors.title)} helperText={touched.title && errors.title} />
                         <TextField label="Описание" name="description" value={values.description} onChange={handleChange} onBlur={handleBlur} multiline rows={4} error={touched.description && Boolean(errors.description)} helperText={touched.description && errors.description} />
                         <TextField label="Краткое описание" name="tagline" value={values.tagline} onChange={handleChange} onBlur={handleBlur} error={touched.tagline && Boolean(errors.tagline)} helperText={touched.tagline && errors.tagline} />
@@ -174,7 +174,7 @@ const CampaignForm = () => {
                             )}
                         </FieldArray>
                         <Button type="submit" variant="contained" color="primary">
-                            Создать
+                            Сохранить
                         </Button>
                     </Box>
                 </Form>

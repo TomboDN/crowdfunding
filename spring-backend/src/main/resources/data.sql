@@ -16,10 +16,12 @@ VALUES (1, 'Другое'),
 ON CONFLICT DO NOTHING;
 
 INSERT INTO users(id, email, password, username)
-VALUES (1, 'system@mail.ru', 'system', 'system');
+VALUES (1, 'system@mail.ru', 'system', 'system')
+ON CONFLICT DO NOTHING;
 
 INSERT INTO user_roles(user_id, role_id)
-VALUES (1, 3);
+VALUES (1, 3)
+ON CONFLICT DO NOTHING;
 
 INSERT INTO campaigns(id, description, end_date, goal_amount, image_url, launch, raised_amount, tagline, title,
                       category_id, user_id)
@@ -97,3 +99,74 @@ VALUES (1, 'Получите доступ к бета-версии прилож�
        (12, 'Пожертвование на 20 квадратных метров озеленения', 17000, 'Партнер', 4)
 ON CONFLICT
     DO NOTHING;
+
+
+CREATE SEQUENCE IF NOT EXISTS users_id_seq
+    INCREMENT 1
+    START 2
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1
+    OWNED BY users.id;
+
+ALTER SEQUENCE users_id_seq
+    OWNER TO postgres;
+
+CREATE SEQUENCE IF NOT EXISTS campaigns_id_seq
+    INCREMENT 1
+    START 5
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1
+    OWNED BY campaigns.id;
+
+ALTER SEQUENCE campaigns_id_seq
+    OWNER TO postgres;
+
+CREATE SEQUENCE IF NOT EXISTS categories_id_seq
+    INCREMENT 1
+    START 9
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1
+    OWNED BY categories.id;
+
+ALTER SEQUENCE categories_id_seq
+    OWNER TO postgres;
+
+CREATE SEQUENCE IF NOT EXISTS contributions_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1
+    OWNED BY contributions.id;
+
+ALTER SEQUENCE contributions_id_seq
+    OWNER TO postgres;
+
+CREATE SEQUENCE IF NOT EXISTS perks_id_seq
+    INCREMENT 1
+    START 13
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1
+    OWNED BY perks.id;
+
+ALTER SEQUENCE public.perks_id_seq
+    OWNER TO postgres;
+
+CREATE SEQUENCE IF NOT EXISTS roles_id_seq
+    INCREMENT 1
+    START 4
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1
+    OWNED BY roles.id;
+
+ALTER SEQUENCE roles_id_seq
+    OWNER TO postgres;
+
+SELECT setval('users_id_seq', (select count(*) from users), true);
+SELECT setval('perks_id_seq', (select count(*) from perks), true);
+SELECT setval('campaigns_id_seq', (select count(*) from campaigns), true);

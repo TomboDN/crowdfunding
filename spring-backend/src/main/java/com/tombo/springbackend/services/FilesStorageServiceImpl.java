@@ -1,14 +1,21 @@
 package com.tombo.springbackend.services;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.*;
+import java.nio.file.spi.FileSystemProvider;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
@@ -16,7 +23,28 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class FilesStorageServiceImpl implements FilesStorageService {
-    private final Path root = Paths.get("./uploads");
+
+    private final Path root;
+
+    public FilesStorageServiceImpl() {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        ResourceLoader resourceLoader = new DefaultResourceLoader(classLoader);
+        try {
+            URI uri = resourceLoader.getResource("classpath:uploads").getURI().normalize();
+            System.out.println(uri.toString());
+            if (!uri.getScheme().equals("file")) {
+                final Map<String, String> env = new HashMap<>();
+                final String[] array = uri.toString().split("!");
+                final FileSystem fs = FileSystems.newFileSystem(URI.create(array[0]), env);
+                root = fs.getPath(array[1] + array[2]);
+            } else {
+                root = Paths.get(uri);
+            }
+            System.out.println(root);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not initialize folder for upload!", e);
+        }
+    }
 
     @Override
     public void init() {
@@ -30,9 +58,10 @@ public class FilesStorageServiceImpl implements FilesStorageService {
     @Override
     public String save(MultipartFile file, Long id) {
         try {
-            Path path = this.root.resolve(id + "_" + file.getOriginalFilename());
+            String name = id + "_" + file.getOriginalFilename();
+            Path path = this.root.resolve(name);
             Files.copy(file.getInputStream(), path);
-            return path.toString().replace('\\', '/').substring(2);
+            return path.toString().substring(path.toString().length() - name.length()-8).replace('\\', '/');
         } catch (Exception e) {
             if (e instanceof FileAlreadyExistsException) {
                 throw new RuntimeException("A file of that name already exists.");

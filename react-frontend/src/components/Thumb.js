@@ -2,7 +2,6 @@ import React from 'react';
 
 class Thumb extends React.Component {
     state = {
-        loading: false,
         thumb: undefined,
     };
 
@@ -22,11 +21,10 @@ class Thumb extends React.Component {
 
     render() {
         const { file } = this.props;
-        const { loading, thumb } = this.state;
+        const { thumb } = this.state;
 
         if (!file) { return null; }
 
-        if (loading) { return <p>loading...</p>; }
 
         return (<img src={thumb}
                      alt={file.name}

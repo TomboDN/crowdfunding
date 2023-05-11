@@ -20,6 +20,7 @@ import CampaignForm from "./components/CampaignForm";
 import HomePage from "./components/HomePage";
 import DonateForm from "./components/DonateForm";
 import NoAuth from "./components/NoAuth";
+import CampaignUpdateForm from "./components/CampaignUpdateForm";
 
 const App = () => {
   const [showModeratorBoard, setShowModeratorBoard] = useState(false);
@@ -124,6 +125,7 @@ const App = () => {
             <Route path="/admin" element={<BoardAdmin />} />
             <Route path="/campaigns/:campaignId" element={<CampaignPage />} />
             <Route path="/campaigns/:campaignId/donate" element={<DonateForm />} />
+            <Route path="/campaigns/:campaignId/update" element={<CampaignUpdateForm />} />
             <Route path="/campaigns/new" element={<CampaignForm />} />
             <Route path="/authError" element={<NoAuth />} />
           </Routes>

@@ -8,6 +8,10 @@ RUN npm install
 
 COPY . .
 
+RUN npm run build
+
+RUN npm install -g serve
+
 EXPOSE 8081
 
-CMD ["npm", "start"]
+CMD ["serve", "-s", "build", "-p", "8081"]

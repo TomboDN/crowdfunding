@@ -10,7 +10,7 @@ import {useNavigate} from "react-router-dom";
 const CampaignPage = () => {
     const [campaign, setCampaign] = useState(null);
     const id = window.location.pathname.split('/')[2];
-    const API_URL = "http://localhost:8080/api/campaigns/";
+    const API_URL = "http://45.155.121.48:8080/api/campaigns/";
     const [daysLeft, setDaysLeft] = useState(0);
     const {user: currentUser} = useSelector((state) => state.auth);
     const navigate = useNavigate();
@@ -53,7 +53,7 @@ const CampaignPage = () => {
                     <Box mb={2}>
                         <Typography variant="h2">{campaign.title}</Typography>
                         <Box width={200}>
-                            <img src={`http://localhost:8080/${campaign.image_url}`} alt={campaign.title}
+                            <img src={`http://45.155.121.48:8080/${campaign.image_url}`} alt={campaign.title}
                                  style={{width: '100%', height: 'auto', objectFit: 'cover'}}/>
                         </Box>
                     </Box>

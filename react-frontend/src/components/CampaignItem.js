@@ -17,7 +17,7 @@ const CampaignItem = ({ campaign }) => {
         <Link to={`/campaigns/${campaign.id}`}>
             <Box display="flex" mb={2} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: '4px' }}>
                 <Box width={300}>
-                    <img src={"http://localhost:8080/" + campaign.image_url} alt={campaign.title} style={{ width: '100%', height: 'auto', objectFit: 'cover' }} />
+                    <img src={"http://45.155.121.48:8080/" + campaign.image_url} alt={campaign.title} style={{ width: '100%', height: 'auto', objectFit: 'cover' }} />
                 </Box>
                 <Box p={2} flexGrow={1}>
                     <Typography variant="h5" style={{color: 'black'}} mb={1}>

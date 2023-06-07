@@ -42,7 +42,7 @@ const CampaignForm = () => {
         if (user == null) {
             navigate("/authError", { replace: true });
         }
-        axios.get('http://localhost:8080/api/campaigns/categories', { headers: authHeader() })
+        axios.get('http://45.155.121.48:8080/api/campaigns/categories', { headers: authHeader() })
             .then(response => {
                 setCategories(response.data.data);
             })
@@ -76,7 +76,7 @@ const CampaignForm = () => {
 
     const handleSubmit = (values) => {
         const user = JSON.parse(localStorage.getItem("user"));
-        const API_URL = "http://localhost:8080/api/campaigns/";
+        const API_URL = "http://45.155.121.48:8080/api/campaigns/";
         axios.post(API_URL, values, { headers: { Authorization: "Bearer " + user.token, 'Content-Type': 'multipart/form-data' } }).then(response => {
             axios.post(API_URL + response.data.message + "/perks", values.perks, { headers: authHeader() }).then(response => {
                 navigate("/", { replace: true });

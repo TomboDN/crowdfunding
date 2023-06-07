@@ -33,7 +33,7 @@ function DonateForm() {
     const [campaignPerks, setCampaignPerks] = useState([]);
     const id = window.location.pathname.split('/')[2];
     const user = JSON.parse(localStorage.getItem('user'));
-    const API_URL = 'http://localhost:8080/api/campaigns/';
+    const API_URL = 'http://45.155.121.48:8080/api/campaigns/';
     const navigate = useNavigate();
     if (user == null) {
         navigate("/authError", { replace: true });

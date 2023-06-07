@@ -2,12 +2,19 @@ import React, {useEffect, useState} from 'react';
 import {Typography, Button, Box, Grid, Divider} from '@mui/material';
 import CampaignPerkItem from './CampaignPerkItem';
 import axios from "axios";
+import {useSelector} from "react-redux";
+import authHeader from "../services/auth-header";
+import {useNavigate} from "react-router-dom";
+
 
 const CampaignPage = () => {
     const [campaign, setCampaign] = useState(null);
     const id = window.location.pathname.split('/')[2];
     const API_URL = "http://localhost:8080/api/campaigns/";
     const [daysLeft, setDaysLeft] = useState(0);
+    const {user: currentUser} = useSelector((state) => state.auth);
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         axios.get(API_URL + id)
@@ -20,13 +27,19 @@ const CampaignPage = () => {
                 const diffTime = endDate.getTime() - today.getTime();
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 setDaysLeft(diffDays);
-                console.log(daysLeft)
+                console.log(daysLeft);
             })
             .catch(error => console.log(error));
-    });
+        console.log(campaign);
+    }, []);
 
     if (!campaign) {
         return <div>Кампании нет...</div>;
+    }
+
+    function deleteCampaign() {
+        axios.delete(API_URL + id, { headers: authHeader() });
+        navigate("/", { replace: true });
     }
 
     const perks = campaign.perks.map((perk) => (
@@ -50,18 +63,23 @@ const CampaignPage = () => {
                         <Typography gutterBottom variant="body1">Категория: {campaign.category}</Typography>
                         <Typography gutterBottom variant="body1">Цель: {campaign.goal_amount} рублей</Typography>
                         <Typography gutterBottom
-                            variant="body1">{daysLeft <= 0 ? 'Кампания завершена' : `Дней осталось: ${daysLeft}`}</Typography>
-                        <Typography gutterBottom variant="body1">Собрано средств: {campaign.raised_amount} рублей</Typography>
+                                    variant="body1">{daysLeft <= 0 ? 'Кампания завершена' : `Дней осталось: ${daysLeft}`}</Typography>
+                        <Typography gutterBottom variant="body1">Собрано
+                            средств: {campaign.raised_amount} рублей</Typography>
                         <Typography gutterBottom variant="body1">Поддержавших: {campaign.backers}</Typography>
                         <Button variant="contained" href={`/campaigns/${id}/donate`}>
                             Поддержать
                         </Button>
-                        <Button variant="contained" href={`/campaigns/${id}/update`}>
-                            Редактировать
-                        </Button>
-                        <Button variant="contained" href={`/campaigns/${id}/delete`}>
-                            Удалить
-                        </Button>
+                        {currentUser.username === campaign.username &&
+                            <div>
+                                <Button variant="contained" href={`/campaigns/${id}/update`}>
+                                    Редактировать
+                                </Button>
+                                <Button variant="contained" onClick={() => deleteCampaign()}>
+                                    Удалить
+                                </Button>
+                            </div>
+                        }
                     </Box>
                 </Grid>
             </Grid>

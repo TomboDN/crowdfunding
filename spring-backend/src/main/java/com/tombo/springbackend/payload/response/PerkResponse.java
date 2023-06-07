@@ -10,6 +10,9 @@ public class PerkResponse {
     private String description;
     private double price;
 
+    public PerkResponse() {
+    }
+
     public PerkResponse(Perk perk){
         this.id = perk.getId();
         this.title = perk.getTitle();

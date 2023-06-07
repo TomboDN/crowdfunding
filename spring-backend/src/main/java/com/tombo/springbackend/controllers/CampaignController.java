@@ -111,7 +111,7 @@ public class CampaignController {
 
         Map<Perk, Integer> perks = new HashMap<>();
         int amount = 0;
-        for (PerkAmountRequest perk : contributionRequest.getPerks()){
+        for (PerkAmountRequest perk : contributionRequest.getPerks()) {
             Optional<Perk> optionalPerk = perkRepository.findById(perk.getId());
             if (optionalPerk.isEmpty()) return ResponseEntity.notFound().build();
             perks.put(optionalPerk.get(), perk.getQuantity());
@@ -155,6 +155,98 @@ public class CampaignController {
         }
 
         return ResponseEntity.ok(new CampaignResponse(campaign, perkResponses, contributions));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateCampaign(@PathVariable Long id, @Valid @ModelAttribute NewCampaignRequest newCampaignRequest) {
+        Optional<Campaign> optionalCampaign = campaignRepository.findById(id);
+        if (optionalCampaign.isEmpty()) return ResponseEntity.notFound().build();
+        Campaign campaign = optionalCampaign.get();
+        int contributions = contributionRepository.countAllByCampaign(campaign);
+
+        List<Perk> perks = perkRepository.findAllByCampaign(campaign);
+        List<PerkResponse> perkResponses = new ArrayList<>();
+
+        for (Perk perk : perks) {
+            perkResponses.add(new PerkResponse(perk));
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+        User user = userRepository.findByUsername(currentPrincipalName).orElseThrow();
+        Category category = categoryRepository.findById(newCampaignRequest.getCategory()).orElseThrow();
+        LocalDate end_date = LocalDate.parse(newCampaignRequest.getEnd_date());
+        String image_url;
+        long campaignCount = campaignRepository.count();
+        try {
+            image_url = storageService.save(newCampaignRequest.getUploadImage(), campaignCount + 1);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+        campaign.setTitle(newCampaignRequest.getTitle());
+        campaign.setGoal_amount(newCampaignRequest.getGoal_amount());
+        campaign.setCategory(category);
+        campaign.setImage_url(image_url);
+        campaign.setTagline(newCampaignRequest.getTagline());
+        campaign.setDescription(newCampaignRequest.getDescription());
+        campaign.setEnd_date(end_date);
+        campaignRepository.save(campaign);
+
+        return ResponseEntity.ok(new CampaignResponse(campaign, perkResponses, contributions));
+    }
+
+    @PutMapping("/{id}/perks")
+    public ResponseEntity<?> updatePerks(@Valid @RequestBody List<PerkRequest> perks, @PathVariable Long id) {
+        Optional<Campaign> optionalCampaign = campaignRepository.findById(id);
+        if (optionalCampaign.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Campaign campaign = optionalCampaign.get();
+        List<Perk> perkListOld = perkRepository.findAllByCampaign(campaign);
+        List<Perk> perkListNew = new ArrayList<>();
+        for (PerkRequest perk : perks) {
+            int changed = 0;
+            for (Perk perk1 : perkListOld) {
+                if (Objects.equals(perk1.getTitle(), perk.getTitle())) {
+                    perk1.setDescription(perk.getDescription());
+                    perk1.setPrice(perk.getPrice());
+                    perkListNew.add(perk1);
+                    perkListOld.remove(perk1);
+                    changed = 1;
+                }
+            }
+            if (changed == 0)
+                perkListNew.add(new Perk(perk.getTitle(), perk.getDescription(), perk.getPrice(), campaign));
+        }
+        if (!perkListNew.isEmpty()) {
+            if (!perkListOld.isEmpty()){
+                perkRepository.deleteAll(perkListOld);
+            }
+            perkRepository.saveAll(perkListNew);
+            return ResponseEntity.ok().build();
+        } else return ResponseEntity.badRequest().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteCampaign(@PathVariable Long id) {
+        Optional<Campaign> optionalCampaign = campaignRepository.findById(id);
+        if (optionalCampaign.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Campaign campaign = optionalCampaign.get();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+        User user = userRepository.findByUsername(currentPrincipalName).orElseThrow();
+        if (campaign.getUser() != user){
+            return ResponseEntity.badRequest().build();
+        }
+        List<Perk> perkList = perkRepository.findAllByCampaign(campaign);
+        if (!perkList.isEmpty()){
+            perkRepository.deleteAll(perkList);
+        }
+        campaignRepository.delete(campaign);
+        return ResponseEntity.ok().build();
     }
 
 

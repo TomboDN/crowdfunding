@@ -79,6 +79,7 @@ const CampaignForm = () => {
         const API_URL = "http://localhost:8080/api/campaigns/";
         axios.post(API_URL, values, { headers: { Authorization: "Bearer " + user.token, 'Content-Type': 'multipart/form-data' } }).then(response => {
             axios.post(API_URL + response.data.message + "/perks", values.perks, { headers: authHeader() }).then(response => {
+                navigate("/", { replace: true });
             })
                 .catch(error => {
                     console.error(error);

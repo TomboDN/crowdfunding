@@ -18,6 +18,7 @@ public class CampaignResponse {
     private String tagline;
     private String title;
     private String image_url;
+    private String username;
 
     public CampaignResponse(Campaign campaign, List<PerkResponse> perks, int backers) {
         this.category = campaign.getCategory().getName();
@@ -30,5 +31,6 @@ public class CampaignResponse {
         this.title = campaign.getTitle();
         this.image_url = campaign.getImage_url();
         this.backers = backers;
+        this.username = campaign.getUser().getUsername();
     }
 }

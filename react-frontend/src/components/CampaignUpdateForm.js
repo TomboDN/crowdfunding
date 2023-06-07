@@ -20,7 +20,7 @@ import authHeader from "../services/auth-header";
 import {useNavigate} from "react-router-dom";
 
 const CampaignForm = () => {
-    const initialValues = {
+    let initialValues = {
         title: '',
         description: '',
         tagline: '',
@@ -35,8 +35,11 @@ const CampaignForm = () => {
         }]
     };
     const [categories, setCategories] = useState([]);
+    const [campaign, setCampaign] = useState(null);
     const user = JSON.parse(localStorage.getItem('user'));
     const navigate = useNavigate();
+    const id = window.location.pathname.split('/')[2];
+    let perks;
 
     useEffect(() => {
         if (user == null) {
@@ -49,8 +52,25 @@ const CampaignForm = () => {
             .catch(error => {
                 console.error(error);
             });
-    });
+        axios.get('http://localhost:8080/api/campaigns/' + id, { headers: authHeader() })
+            .then(response => {
+                setCampaign(response.data);
+                initialValues = {
+                    title: response.data.title,
+                    description: response.data.description,
+                    tagline: response.data.tagline,
+                    goal_amount: response.data.goal_amount,
+                    end_date: response.data.end_date,
+                    uploadImage: response.data.image_url,
+                    category: response.data.category,
+                    perks: response.data.perks
+                };
 
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }, []);
 
     const validationSchema = Yup.object({
         title: Yup.string().required('Обязательное поле'),
@@ -77,8 +97,9 @@ const CampaignForm = () => {
     const handleSubmit = (values) => {
         const user = JSON.parse(localStorage.getItem("user"));
         const API_URL = "http://localhost:8080/api/campaigns/";
-        axios.post(API_URL, values, { headers: { Authorization: "Bearer " + user.token, 'Content-Type': 'multipart/form-data' } }).then(response => {
-            axios.post(API_URL + response.data.message + "/perks", values.perks, { headers: authHeader() }).then(response => {
+        console.log(values)
+        axios.put(API_URL + id, values, { headers: { Authorization: "Bearer " + user.token, 'Content-Type': 'multipart/form-data' } }).then(response => {
+            axios.put(API_URL + id + "/perks", values.perks, { headers: authHeader() }).then(response => {
             })
                 .catch(error => {
                     console.error(error);
